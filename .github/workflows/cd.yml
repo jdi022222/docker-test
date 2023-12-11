@@ -54,7 +54,7 @@ jobs:
           docker buildx build --platform linux/amd64,linux/arm64 -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }} --push .
 
       # Ubuntu에 접속하고 배포
-      - name: Deploy to Prod WAS Server
+      - name: Deploy to Prod Ubuntu Server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -63,7 +63,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           # docker-compose가 있는 디렉토리로 이동 후 수행
           script: |
-            docker rm -f $(sudo docker ps -qa)
+            docker rm -f $(docker ps -qa)
             docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
             docker run -d -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
             docker image prune -f
