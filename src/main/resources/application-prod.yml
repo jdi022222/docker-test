@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:mariadb://127.0.0.1:$3306/docker_test?characterEncoding=UTF-8
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
