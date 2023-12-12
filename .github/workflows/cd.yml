@@ -29,13 +29,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Access to Secrets and Make application-prod.yml
+      - name: Create application-prod.yml
         run: |
-          echo "RDS_USERNAME=${RDS_USERNAME}" >> $YML_FILE
-          echo "RDS_PASSWORD=${RDS_PASSWORD}" >> $YML_FILE
+          echo "RDS_USERNAME: ${{secrets.RDS_USERNAME}}" > $YML_FILE
+          echo "RDS_PASSWORD: ${{secrets.RDS_PASSWORD}}" >> $YML_FILE
         env:
-          RDS_USERNAME: ${{secrets.RDS_USERNAME}}
-          RDS_PASSWORD: ${{secrets.RDS_PASSWORD}}
           YML_FILE: ./src/main/resources/application-prod.yml
 
       # gradlew에 실행 권한을 부여
