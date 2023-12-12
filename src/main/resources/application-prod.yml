@@ -1,9 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:mariadb://1.247.76.22:3306/docker_test?serverTimezone=Asia/Seoul
-    username: ${RDS_USERNAME}
-    password: ${RDS_PASSWORD}
-  jpa:
-    hibernate:
-      ddl-auto: create
-    open-in-view: false
