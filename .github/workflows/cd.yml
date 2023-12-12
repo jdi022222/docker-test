@@ -9,10 +9,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    env:
-      RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
-      RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
-
     steps:
       - name: Repository Checkout
         uses: actions/checkout@v3
@@ -32,6 +28,13 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('/.gradle', '/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
+      - name: Create application-prod.yml by secrets
+        run: |
+          cd ./src/main/resources
+          touch ./application-prod.yml
+          echo "${{ secrets.YML_PROD }}" > ./application-prod.yml
+        shell: bash
 
       # gradlew에 실행 권한을 부여
       - name: Grant Execute Permisson for Gradlew
