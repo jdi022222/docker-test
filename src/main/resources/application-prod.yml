@@ -5,5 +5,5 @@ spring:
     password: ${RDS_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     open-in-view: false
