@@ -3,7 +3,7 @@
 IS_GREEN=$(docker ps | grep green) # 현재 실행중인 App이 blue인지 확인합니다.
 DEFAULT_CONF=" /etc/nginx/nginx.conf"
 
-if [ -z $IS_GREEN  ];then # blue라면
+if [ -z $IS_GREEN  ];then
 
   echo "### BLUE => GREEN ###"
 
@@ -26,10 +26,11 @@ if [ -z $IS_GREEN  ];then # blue라면
 
   echo "4. reload nginx"
   sudo cp /etc/nginx/nginx.green.conf /etc/nginx/nginx.conf
-  sudo nginx -s rel
+  sudo nginx -s reload
 
   echo "5. blue container down"
   docker-compose stop blue
+
 else
   echo "### GREEN => BLUE ###"
 
