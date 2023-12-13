@@ -53,7 +53,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      # 이미지를 빌드 후 push
+      # dockerfile을 이용해 이미지를 빌드 후 push
       # 로그인하지 않으면 push 시에 요청이 거부될 수 있음
       - name: Docker Hub build & push
         run: |
@@ -72,5 +72,6 @@ jobs:
           script: |
             docker rm -f $(docker ps -qa)
             docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
-            docker run -d -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
+            chmod 777 ./deploy.sh
+            ./deploy.sh
             docker image prune -f
