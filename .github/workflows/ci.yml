@@ -1,0 +1,63 @@
+name: CI - Gradle Build
+# Event
+on:
+  pull_request:
+    branches: [ main ]
+
+# 권한 설정
+permissions: write-all
+
+# Work
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Create application-prod.yml by secrets
+        run: |
+          cd ./src/main/resources
+          touch ./application-prod.yml
+          echo "${{ secrets.YML_PROD }}" > ./application-prod.yml
+        shell: bash
+
+      # 테스트를 진행하기 위해 액션 서버에 docker로 mysql 띄우기
+      - name: Create Mysql Docker Container
+        run: sudo docker run -d -p 3305:3306 --env MYSQL_DATABASE="test" --env MYSQL_ROOT_PASSWORD="test" mysql:8.0.31
+
+      # 빌드시 캐시 적용
+      - name: Cache Gradle Packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      # 빌드
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      # 테스트 커버리지 리포트 생성
+      - name: Add Test Coverage Report as Comment to the PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.2
+        with:
+          title: 📝 테스트 커버리지 리포트
+          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ github.token }}
+          min-coverage-overall: 50
+          min-coverage-changed-files: 50
+
+      ## 테스트 실패시 코드 라인에 대한 체크 추가
+      - name: if test fail, add check comment on failed code line
+        uses: mikepenz/action-junit-report@v3
+        with:
+          report_paths: '**/build/test-results/test/TEST-*.html'
+          token: ${{ github.token }}
