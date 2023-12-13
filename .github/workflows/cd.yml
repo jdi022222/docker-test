@@ -60,7 +60,7 @@ jobs:
           docker buildx create --use
           docker buildx build --platform linux/amd64,linux/arm64 -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }} --push .
 
-      # deploy.sh 파일 서버로 전달하기(복사 후 붙여넣기)
+      # deploy.sh 파일 서버로 전달하기
       - name: Send deploy.sh to Prod Ubuntu Server
         uses: appleboy/scp-action@master
         with:
@@ -68,10 +68,24 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
-          source: "./deploy.sh"
-          target: "/home/jdi0222"
+          source: "./script/deploy.sh"
+          target: "/home/jdi0222/"
+
+
+      # 도커 컴포즈 설정 파일 서버로 전달하기
+      - name: Send docker-compose.yml to Prod Ubuntu Server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          source: "./.docker/docker-compose.yml"
+          target: "/home/jdi0222/"
 
       # Ubuntu에 접속하고 배포
+      # 도커 컴포즈 실행하기
+      # 도커 허브에서 jar파일 및 pull후에 컴포즈 up
       - name: Deploy to Prod Ubuntu Server
         uses: appleboy/ssh-action@master
         with:
@@ -79,10 +93,11 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
-          # docker-compose가 있는 디렉토리로 이동 후 수행
           script: |
-            docker rm -f $(docker ps -qa)
-            docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
+            sudo cp /home/jdi0222/.docker/docker-compose.yml /home/jdi0222
+            sudo cp /home/jdi0222/script/deploy.sh /home/jdi0222
+            cd /home/jdi0222
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
             chmod 777 ./deploy.sh
             ./deploy.sh
             docker image prune -f
