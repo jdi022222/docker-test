@@ -1,5 +1,5 @@
 name: CI - Gradle Build
-# Event
+
 on:
   pull_request:
     branches: [ main ]
