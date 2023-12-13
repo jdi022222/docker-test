@@ -58,7 +58,8 @@ jobs:
       - name: Docker Hub build & push
         run: |
           docker buildx create --use
-          docker buildx build --platform linux/amd64,linux/arm64 -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }} --push .
+          docker buildx build --platform linux/amd64,linux/arm64 -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}  -f ./.docker/Dockerfile --push .
+
 
       # deploy.sh 파일 서버로 전달하기
       - name: Send deploy.sh to Prod Ubuntu Server
