@@ -7,7 +7,7 @@ services:
     image: jdi0222/docker-test
     ports:
       - 8081:8080  # Blue -> 8081
-      -
+      
   green:
     container_name: green
     image: jdi0222/docker-test
